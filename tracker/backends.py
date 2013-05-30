@@ -48,7 +48,6 @@ class GoogleAnalytics(BaseBackend):
         else:
             cid = self.get_anonymous_id(request)
 
-        print cid
         headers = {
             'User-Agent': user_agent,
         }
