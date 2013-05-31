@@ -38,7 +38,7 @@ class GoogleAnalytics(BaseBackend):
     def page(self, request, response):
         host = request.META.get('HTTP_HOST')
         user_agent = request.META.get('HTTP_USER_AGENT')
-        path = request.path
+        path = request.get_full_path()
 
         # UA does not support X-Forwarded-For yet.
         #ip = request.META.get('REMOTE_ADDR')
