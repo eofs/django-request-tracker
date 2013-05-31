@@ -18,6 +18,12 @@ class BaseBackend(object):
         conn.request(self.method, self.url, params, headers)
         conn.getresponse()
 
+    def get_user_id(self, request):
+        if request.user and request.user.is_authenticated():
+            return request.user.pk
+        else:
+            return self.get_anonymous_id(request)
+
     def get_anonymous_id(self, request):
         host = request.META.get('HTTP_HOST')
         user_agent = request.META.get('HTTP_USER_AGENT')
@@ -39,14 +45,10 @@ class GoogleAnalytics(BaseBackend):
         host = request.META.get('HTTP_HOST')
         user_agent = request.META.get('HTTP_USER_AGENT')
         path = request.get_full_path()
+        cid = self.get_user_id(request)
 
         # UA does not support X-Forwarded-For yet.
         #ip = request.META.get('REMOTE_ADDR')
-
-        if request.user.is_authenticated():
-            cid = request.user.pk
-        else:
-            cid = self.get_anonymous_id(request)
 
         headers = {
             'User-Agent': user_agent,
