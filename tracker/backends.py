@@ -19,8 +19,9 @@ class BaseBackend(object):
         conn.getresponse()
 
     def get_user_id(self, request):
-        if request.user and request.user.is_authenticated():
-            return request.user.pk
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated():
+            return user.pk
         else:
             return self.get_anonymous_id(request)
 
@@ -61,8 +62,5 @@ class GoogleAnalytics(BaseBackend):
             'dh': host,                     # Document hostname
             'dp': path,                     # Page
         }
-
-        if request.user and request.user.is_authenticated():
-            parameters['cid'] = request.user.pk
 
         self.send(parameters, headers)
