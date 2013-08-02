@@ -1,22 +1,18 @@
-import httplib
-import urllib
+import requests
 
 from django.conf import settings
 
 
 class BaseBackend(object):
     host = None
-    url = '/'
     method = 'POST'
 
-    def send(self, params, headers=None):
+    def send(self, data, params=None, headers=None):
         if self.host is None:
             return
 
-        conn = httplib.HTTPSConnection(self.host)
-        params = urllib.urlencode(params)
-        conn.request(self.method, self.url, params, headers)
-        conn.getresponse()
+        response = requests.request(self.method, self.host, data=data, headers=headers, params=params)
+        return response
 
     def get_user_id(self, request):
         user = getattr(request, 'user', None)
@@ -36,8 +32,7 @@ class BaseBackend(object):
         pass
 
 class GoogleAnalytics(BaseBackend):
-    host = 'ssl.google-analytics.com'
-    url = '/collect'
+    host = 'https://ssl.google-analytics.com/collect'
 
     def __init__(self):
         self.analytics_key = getattr(settings, 'GOOGLE_ANALYTICS_KEY', None)
@@ -54,7 +49,7 @@ class GoogleAnalytics(BaseBackend):
         headers = {
             'User-Agent': user_agent,
         }
-        parameters = {
+        data = {
             'v': 1,                         # Version
             'tid': self.analytics_key,      # UA-xxxxx
             'cid': cid,                     # Anonymous Client ID
@@ -63,4 +58,4 @@ class GoogleAnalytics(BaseBackend):
             'dp': path,                     # Page
         }
 
-        self.send(parameters, headers)
+        self.send(data, headers=headers)
