@@ -21,8 +21,14 @@ class BaseBackend(object):
         else:
             return self.get_anonymous_id(request)
 
+    def get_client_ip(self, request):
+        try:
+            return request.META['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
+        except KeyError:
+            return request.META['REMOTE_ADDR']
+
     def get_anonymous_id(self, request):
-        host = request.META.get('REMOTE_ADDR')
+        host = self.get_client_ip(request)
         user_agent = request.META.get('HTTP_USER_AGENT', host)
         user_id = hash(''.join([host, user_agent]))
         return 'anon-%s' % user_id
