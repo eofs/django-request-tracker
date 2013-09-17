@@ -7,10 +7,10 @@ import os
 import sys
 
 
-name = 'django-tracker'
+name = 'django-request-tracker'
 package = 'tracker'
-description = ''
-url = 'http://github.com/.../.../'
+description = 'Track incoming requests using analytic services.'
+url = 'https://github.com/eofs/django-request-tracker'
 author = 'Tomi Pajunen'
 author_email = 'tomi@madlab.fi'
 license = 'BSD'
