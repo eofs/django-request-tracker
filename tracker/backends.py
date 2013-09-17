@@ -23,7 +23,7 @@ class BaseBackend(object):
 
     def get_anonymous_id(self, request):
         host = request.META.get('HTTP_HOST')
-        user_agent = request.META.get('HTTP_USER_AGENT')
+        user_agent = request.META.get('HTTP_USER_AGENT', host)
         user_id = hash(''.join([host, user_agent]))
         return 'anon-%s' % user_id
 
