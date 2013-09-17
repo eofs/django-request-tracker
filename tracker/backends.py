@@ -25,7 +25,7 @@ class BaseBackend(object):
         try:
             return request.META['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
         except KeyError:
-            return request.META['REMOTE_ADDR']
+            return request.META.get('REMOTE_ADDR', '0.0.0.0')
 
     def get_anonymous_id(self, request):
         host = self.get_client_ip(request)
