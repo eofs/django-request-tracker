@@ -1,6 +1,7 @@
 import requests
 
 from django.conf import settings
+from django.utils.http import urlquote
 
 
 class BaseBackend(object):
@@ -11,7 +12,9 @@ class BaseBackend(object):
         if self.host is None:
             return
 
-        response = requests.request(self.method, self.host, data=data, headers=headers, params=params)
+        response = requests.request(self.method, self.host,
+                                    data=data, headers=headers,
+                                    params=params)
         return response
 
     def get_user_id(self, request):
@@ -33,9 +36,10 @@ class BaseBackend(object):
         user_id = hash(''.join([host, user_agent]))
         return 'anon-%s' % user_id
 
-    def page(self, request,host, path):
+    def page(self, request, host, path):
         # Override this method to send page views
         pass
+
 
 class GoogleAnalytics(BaseBackend):
     host = 'https://ssl.google-analytics.com/collect'
@@ -45,7 +49,9 @@ class GoogleAnalytics(BaseBackend):
 
     def page(self, request, response):
         host = request.META.get('HTTP_HOST')
+        source_ip = self.get_client_ip(request)
         user_agent = request.META.get('HTTP_USER_AGENT')
+        user_agent_quoted = urlquote(user_agent)
         path = request.get_full_path()
         cid = self.get_user_id(request)
 
@@ -62,6 +68,8 @@ class GoogleAnalytics(BaseBackend):
             't': 'pageview',                # Hit type
             'dh': host,                     # Document hostname
             'dp': path,                     # Page
+            'uip': source_ip,               # Override IP
+            'ua': user_agent_quoted         # Override User-Agent
         }
 
         self.send(data, headers=headers)
